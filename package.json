@@ -1,0 +1,11 @@
+{
+  "name": "taxiTracker",
+  "description": "Tracks a single taxi on a single day from the 2013 data",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "express": "latest",
+    "parse": "^1.2.19",
+    "request": "^2.40.0"
+  }
+}
