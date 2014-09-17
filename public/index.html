@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
 
   <title>NYC Subway</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="/style.css">
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 
@@ -46,7 +46,7 @@
             for(var i = 0;i<data.length;i++)
             {
               distance.push(
-                    getDistance(40.692703, -73.991684, data[i].stop_lat, data[i].stop_lon)
+                    getDistance(pos.coords.latitude, pos.coords.longitude, data[i].stop_lat, data[i].stop_lon)
                   );
             }
             var result = findMaxVals(distance);
