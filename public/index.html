@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
 
   <title>NYC Subway</title>
-  <link rel="stylesheet" href="/app/styles/index.css">
+  <link rel="stylesheet" href="css/style.css">
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 
@@ -46,7 +46,7 @@
             for(var i = 0;i<data.length;i++)
             {
               distance.push(
-                    getDistance(pos.coords.latitude, pos.coords.longitude, data[i].stop_lat, data[i].stop_lon)
+                    getDistance(40.692703, -73.991684, data[i].stop_lat, data[i].stop_lon)
                   );
             }
             var result = findMaxVals(distance);
@@ -66,24 +66,23 @@
 
     //takes in two sets of points and returns distance
     function getDistance(lat1, lon1, lat2, lon2){
-      var R = 6371; // km
-      var φ1 = toRad(lat1);
-      var φ2 = toRad(lat2);
-      var Δφ = toRad(lat2-lat1);
-      var Δλ = toRad(lat2-lat1);
+        var radlat1 = Math.PI * lat1/180
+        var radlat2 = Math.PI * lat2/180
+        var radlon1 = Math.PI * lon1/180
+        var radlon2 = Math.PI * lon2/180
+        var theta = lon1-lon2
+        var radtheta = Math.PI * theta/180
+        var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+        dist = Math.acos(dist)
+        dist = dist * 180/Math.PI
+        dist = dist * 60 * 1.1515
+        return dist
 
-      var a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-              Math.cos(φ1) * Math.cos(φ2) *
-              Math.sin(Δλ/2) * Math.sin(Δλ/2);
-      var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-      var d = R * c;
-      return d;
     }
 
     /** Converts numeric degrees to radians */
     function toRad(Value) {
-      return Value * Math.PI / 180;
+      return (Value / 180) * Math.PI ;
     }   
 
   </script>
