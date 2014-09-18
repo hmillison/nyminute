@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
 
   <title>NY Minute</title>
+  <link rel="icon" href="img/favicon.png" type="image/png" >
+
   <link href="css/style.css" rel="stylesheet">
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
@@ -49,7 +51,7 @@
             for(var i = 0;i<data.length;i++)
             {
               if(data[i].parent_station == ""){
-                var dist_to_stop = getDistance(pos.coords.latitude, pos.coords.longitude, data[i].stop_lat, data[i].stop_lon)
+                var dist_to_stop = getDistance(40.728575, -74.000021, data[i].stop_lat, data[i].stop_lon)
                 // var dist_to_stop = getDistance(pos.coords.latitude, pos.coords.longitude, data[i].stop_lat, data[i].stop_lon)
                
                   distance.push({
@@ -68,6 +70,7 @@
              stops = findMaxVals(distance);
             }
             $('#status').text("");
+            stops.sort(compareNumbers);
             for(var k = 0;k<stops.length;k++){
               $('#station').append("<p> Closest Stop: " + stops[k].stop_name + "<br /> Distance from You: " + stops[k].dist.toFixed(2)  + " mi </p>");
             }
