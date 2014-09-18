@@ -78,7 +78,7 @@
 
     function findMaxVals(arr){
       var output = [];
-      arr = arr.sort();
+      arr = arr.sort(compareNumbers);
       console.log(arr);
       for(var i = 0;i<4;i++)
       {
@@ -88,6 +88,10 @@
       }
       console.log(output);
       return output;
+    }
+
+    function compareNumbers(a, b) {
+      return a.dist -  b.dist;
     }
 
     //takes in two sets of points and returns distance
