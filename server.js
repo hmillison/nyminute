@@ -50,8 +50,8 @@ app.get('/getstoptimes', function(req,res){
 	if(min == undefined){
 		min = 15;
 	}
-	var currenttime = moment().format('HH:mm:ss');
-	var comparetime = moment().add(min,'m').format('HH:mm:ss');
+	var currenttime = moment().format('HH:mm:ss EST');
+	var comparetime = moment().add(min,'m').format('HH:mm:ss EST');
 	var StopTime = Parse.Object.extend("stop_times");
 	var query = new Parse.Query(StopTime);
 	query.equalTo("stop_id", req.query.stopid);
