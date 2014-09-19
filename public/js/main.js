@@ -160,8 +160,9 @@ function findStation(pos){
                console.log(trains[item]);
                for(var i = 0;i<trains[item].length;i++){
                 printTrain(trains[item][i], selector);
-                console.log(trains[item][i].arrival_time.diff(moment(), 'minutes'));
-                console.log(trains[item][i].arrival_time.format("HH:mm:ss"));
+                console.log("minutes away: " + trains[item][i].arrival_time.diff(moment(), 'minutes'));
+                console.log("train time: " + trains[item][i].arrival_time.format("HH:mm:ss"));
+                console.log("current time: " + moment().format("HH:mm:ss"));
                 console.log(trains[item][i].route_id + ":" + trains[item][i].trip_headsign + ":" + trains[item][i].arrival_time);
                }
           }
