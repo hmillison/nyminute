@@ -9,7 +9,7 @@ function findStation(pos){
             for(var i = 0;i<data.length;i++)
             {
               if(data[i].parent_station == ""){
-                var dist_to_stop = getDistance(40.728567, -73.999732, data[i].stop_lat, data[i].stop_lon)
+                 var dist_to_stop = getDistance(40.692578, -73.992528, data[i].stop_lat, data[i].stop_lon)
                 // var dist_to_stop = getDistance(pos.coords.latitude, pos.coords.longitude, data[i].stop_lat, data[i].stop_lon)
                
                   distance.push({
@@ -79,14 +79,14 @@ function findStation(pos){
           type : "GET",
           url : "/getstoptimes?stopid=" + stop.stop_id + "N", 
           success : function(data){
-            TrainData(stop,data);
+            TrainData(stop,data, "N");
           }
         });
          $.ajax({
           type : "GET",
           url : "/getstoptimes?stopid=" + stop.stop_id + "S", 
           success : function(data){
-            TrainData(stop,data);
+            TrainData(stop,data, "S");
           }
         }); 
     }
@@ -94,7 +94,7 @@ function findStation(pos){
     var deferreds = [];
     var results = {};
 
-    function TrainData(stops,stopinfo)
+    function TrainData(stops,stopinfo, direction)
     {
       var stopid=stopinfo[0].stop_id;
       var output = [];
@@ -110,7 +110,7 @@ function findStation(pos){
       }
       $.when.apply($, deferreds).done(function() {
         var output = results[stopid];
-        printOutput(stopinfo, output, stops);
+        printOutput(stopinfo, output, stops, direction);
         deferred = [];
       });
     }
@@ -128,45 +128,56 @@ function findStation(pos){
         });
     }
 
-    function printOutput(traintimes,traininfo,station){
+    function printOutput(traintimes,traininfo,station, direction){
 
       $('#status').fadeOut(function(){
-          $('.stop-results').append('<div class="row" id="' + traintimes[0].stop_id + '"><div class="col-md-6">' + station.stop_name
-        + '</div><div class="col-md-6">' + station.dist.toFixed(2)
-        + ' mi </div>');
-      });
-      var trains = sortTrains(traintimes,traininfo, "service_id");
-      var dayofweek = moment().format("ddd").toUpperCase();
-      console.log(trains);
-      for(var item in trains)
-      {
-        if(item.indexOf(dayofweek) != -1){
-          for(var i = 0;i<trains[item].length;i++){
-              trains[item].sort(compareTime);
-              printTrain(trains[item][i]);
-              console.log(trains[item][i].route_id + ":" + trains[item][i].trip_headsign + ":" + trains[item][i].arrival_time);
-             }
+        if(direction == "S"){
+            $('.stop-results').append('<div class="row station" id="' + traintimes[0].stop_id + '"><div class="col-md-6">' + station.stop_name
+          + ' - South</div><div class="col-md-6">' + station.dist.toFixed(2)
+          + ' mi </div>');
         }
-        else if(item.indexOf("WKD") != -1 && dayofweek != "SAT" && dayofweek != "SUN"){
-             trains[item].sort(compareTime);
-             console.log(trains[item]);
-             for(var i = 0;i<trains[item].length;i++){
-              printTrain(trains[item][i]);
-              console.log(trains[item][i].arrival_time.diff(moment(), 'minutes'));
-              console.log(trains[item][i].arrival_time.format("HH:mm:ss"));
-              console.log(trains[item][i].route_id + ":" + trains[item][i].trip_headsign + ":" + trains[item][i].arrival_time);
-             }
+        else{
+            $('.stop-results').append('<div class="row station" id="' + traintimes[0].stop_id + '"><div class="col-md-6">' + station.stop_name
+            + ' - North</div><div class="col-md-6">' + station.dist.toFixed(2)
+            + ' mi </div>');
         }
+        console.log(traintimes[0].stop_id + " Station Printed");
+        var trains = sortTrains(traintimes,traininfo, "service_id");
+        var dayofweek = moment().format("ddd").toUpperCase();
+        console.log(trains);
+        var selector = $('#' + traintimes[0].stop_id + '');
+        for(var item in trains)
+        {
+          if(item.indexOf(dayofweek) != -1){
+            for(var i = 0;i<trains[item].length;i++){
+                trains[item].sort(compareTime);
+                printTrain(trains[item][i]);
+                console.log(trains[item][i].route_id + ":" + trains[item][i].trip_headsign + ":" + trains[item][i].arrival_time);
+               }
+          }
+          else if(item.indexOf("WKD") != -1 && dayofweek != "SAT" && dayofweek != "SUN"){
+               trains[item].sort(compareTime);
+               console.log(trains[item]);
+               for(var i = 0;i<trains[item].length;i++){
+                printTrain(trains[item][i], selector);
+                console.log(trains[item][i].arrival_time.diff(moment(), 'minutes'));
+                console.log(trains[item][i].arrival_time.format("HH:mm:ss"));
+                console.log(trains[item][i].route_id + ":" + trains[item][i].trip_headsign + ":" + trains[item][i].arrival_time);
+               }
+          }
 
-       
-      }
+         
+        }
+      });
+     
       //console.log(trains);
     }
 
-    function printTrain(train){
-      $('#' + train.stop_id + '').after('<div class="row train-' + train.route_id + '"><div class="col-md-4">' +
-            train.route_id + '</div><div class="col-md-4 ">' + train.trip_headsign + '</div><div class="col-md-4"> Arriving in ' + 
-            train.arrival_time.diff(moment(), 'minutes') + ' minutes</div></div>').slideDown(400);
+    function printTrain(train, selector){
+      selector.after('<div class="row train-' + train.route_id + '"><div class="col-md-4">' +
+            train.route_id + '</div><div class="col-md-4">' + train.trip_headsign + '</div><div class="col-md-4"> Arriving in ' + 
+            train.arrival_time.diff(moment(), 'minutes') + ' minutes</div></div>');
+      console.log(train.stop_id + " printed!")
     }
 
     function sortTrains(times, info, id)
