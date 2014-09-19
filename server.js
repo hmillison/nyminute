@@ -45,7 +45,6 @@ app.get('/getcsvjson', function(req,res){
 	fileStream.pipe(csvConverter);	
 });
 
-var hello;
 app.get('/getstoptimes', function(req,res){
 	var min = req.query.minutes
 	if(min == undefined){
@@ -63,6 +62,21 @@ app.get('/getstoptimes', function(req,res){
 	  	res.send(data)
 	  },
 	  error: function(error) {
+	  	res.send({error : "Stop Times not found"})
+	  }
+	});
+});
+
+app.get('/gettrips', function(req,res){;
+	var Trips = Parse.Object.extend("trips");
+	var query = new Parse.Query(Trips);
+	query.equalTo("trip_id", req.query.tripid);
+	query.find({
+	  success: function(data) {
+	  	res.send(data)
+	  },
+	  error: function(error) {
+	  	res.send({error : "Trips not found"})
 	  }
 	});
 });

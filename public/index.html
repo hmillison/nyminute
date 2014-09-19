@@ -8,28 +8,32 @@
   <title>NY Minute</title>
   <link rel="icon" href="img/favicon.png" type="image/png" >
 
-  <link href="css/style.css" rel="stylesheet">
   <link href="css/bootstrap.min.css" rel="stylesheet">
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <link href="css/style.css" rel="stylesheet">
 
 </head>
 
 <body>
   <nav class="navbar navbar-inverse">
-    <a class="navbar-brand">New York Minute: Subway Finder</a>
+    <a class="navbar-brand">New York Minute</a>
     
   </nav>
   <div class="container text-center">
-    <div id="status">
+    <div class="alert alert-info" id="status">
       Finding Your Location
     </div>
      <div id="coords">
     </div>
-    <div id="station">
-    </div>
+    
+  </div>
+  <div class="container text-center results">
+    <div class="stop-results">
+      </div>
   </div>
  
-  
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+      <script src="js/moment.js"></script>
+    <script src="js/main.js"></script>
  <script>
     $(document).ready(function(){
         if (navigator.geolocation) {
@@ -38,79 +42,7 @@
         else {
             $("#status").text("Geolocation is not supported by this browser.");
         }
-    });      
-    
-    function findStation(pos){
-      $("#status").text("Locating Nearest Subway Station");
-      var distance = [];
-      var stops = [];
-      $.ajax({
-          type : "GET",
-          url : "/getcsvjson?file=stops",
-          success : function(data){
-            for(var i = 0;i<data.length;i++)
-            {
-              if(data[i].parent_station == ""){
-                var dist_to_stop = getDistance(40.728575, -74.000021, data[i].stop_lat, data[i].stop_lon)
-                // var dist_to_stop = getDistance(pos.coords.latitude, pos.coords.longitude, data[i].stop_lat, data[i].stop_lon)
-               
-                  distance.push({
-                        stop_id : data[i].stop_id,
-                        stop_name : data[i].stop_name,
-                        dist   : dist_to_stop
-                      });
-                if(distance[distance.length-1].dist < .5){
-                    stops.push(distance[distance.length-1]);
-                }
-              }
-            }
-            //Get 4 closest stops if none within half mile
-            if(stops.length == 0)
-            {
-             stops = findMaxVals(distance);
-            }
-            $('#status').text("");
-            stops.sort(compareNumbers);
-            for(var k = 0;k<stops.length;k++){
-              $('#station').append("<p> Closest Stop: " + stops[k].stop_name + "<br /> Distance from You: " + stops[k].dist.toFixed(2)  + " mi </p>");
-            }
-          }
-        });
-      
-    }
-
-    function findMaxVals(arr){
-      var output = [];
-      arr = arr.sort(compareNumbers);
-      console.log(arr);
-      for(var i = 0;i<4;i++)
-      {
-        output.push(
-                      arr[i]
-                    );
-      }
-      console.log(output);
-      return output;
-    }
-
-    function compareNumbers(a, b) {
-      return a.dist -  b.dist;
-    }
-
-    //takes in two sets of points and returns distance
-    function getDistance(lat1, lon1, lat2, lon2){
-        var radlat1 = Math.PI * lat1/180
-        var radlat2 = Math.PI * lat2/180
-        var radlon1 = Math.PI * lon1/180
-        var radlon2 = Math.PI * lon2/180
-        var theta = lon1-lon2
-        var radtheta = Math.PI * theta/180
-        var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
-        dist = Math.acos(dist)
-        dist = dist * 180/Math.PI
-        dist = dist * 60 * 1.1515
-        return dist
-    }  
+    });       
   </script>
 </body>
 </html>
