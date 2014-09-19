@@ -9,8 +9,8 @@ function findStation(pos){
             for(var i = 0;i<data.length;i++)
             {
               if(data[i].parent_station == ""){
-                 var dist_to_stop = getDistance(40.692578, -73.992528, data[i].stop_lat, data[i].stop_lon)
-                // var dist_to_stop = getDistance(pos.coords.latitude, pos.coords.longitude, data[i].stop_lat, data[i].stop_lon)
+                //var dist_to_stop = getDistance(40.692578, -73.992528, data[i].stop_lat, data[i].stop_lon)
+                var dist_to_stop = getDistance(pos.coords.latitude, pos.coords.longitude, data[i].stop_lat, data[i].stop_lon)
                
                   distance.push({
                         stop_id : data[i].stop_id,
