@@ -9,8 +9,8 @@ function findStation(pos){
             for(var i = 0;i<data.length;i++)
             {
               if(data[i].parent_station == ""){
-                //var dist_to_stop = getDistance(40.692578, -73.992528, data[i].stop_lat, data[i].stop_lon)
-                var dist_to_stop = getDistance(pos.coords.latitude, pos.coords.longitude, data[i].stop_lat, data[i].stop_lon)
+                var dist_to_stop = getDistance(40.692578, -73.992528, data[i].stop_lat, data[i].stop_lon)
+                //var dist_to_stop = getDistance(pos.coords.latitude, pos.coords.longitude, data[i].stop_lat, data[i].stop_lon)
                
                   distance.push({
                         stop_id : data[i].stop_id,
@@ -129,19 +129,14 @@ function findStation(pos){
     }
 
     function printOutput(traintimes,traininfo,station, direction){
-
       $('#status').fadeOut(function(){
-        if(direction == "S"){
-            $('.stop-results').append('<div class="row station" id="' + traintimes[0].stop_id + '"><div class="col-md-6">' + station.stop_name
-          + ' - South</div><div class="col-md-6">' + station.dist.toFixed(2)
-          + ' mi </div>');
+        console.log(station.stop_id);
+        var html = '<div class="stops" id="' + station.dist.toFixed(2) +  '" style="display:none">';
+        if(!$('#' + station.stop_id + '').length){
+            html += '<div class="row station" id="' + station.stop_id + '"><div class="col-md-6">' + station.stop_name
+          + '</div><div class="col-md-6">' + station.dist.toFixed(2)
+          + ' mi </div></div>'
         }
-        else{
-            $('.stop-results').append('<div class="row station" id="' + traintimes[0].stop_id + '"><div class="col-md-6">' + station.stop_name
-            + ' - North</div><div class="col-md-6">' + station.dist.toFixed(2)
-            + ' mi </div>');
-        }
-        console.log(traintimes[0].stop_id + " Station Printed");
         var trains = sortTrains(traintimes,traininfo, "service_id");
         var dayofweek = moment().format("ddd").toUpperCase();
         console.log(trains);
@@ -149,36 +144,56 @@ function findStation(pos){
         for(var item in trains)
         {
           if(item.indexOf(dayofweek) != -1){
-            for(var i = 0;i<trains[item].length;i++){
-                trains[item].sort(compareTime);
-                printTrain(trains[item][i]);
-                console.log(trains[item][i].route_id + ":" + trains[item][i].trip_headsign + ":" + trains[item][i].arrival_time);
-               }
+            console.log(trains[item].length);
+              for(var i = 0;i<trains[item].length;i++){
+                  trains[item].sort(compareTime);
+                  html += printTrain(trains[item][i], selector);
+                  console.log(trains[item][i].route_id + ":" + trains[item][i].trip_headsign + ":" + trains[item][i].arrival_time);
+                 }
+             
           }
           else if(item.indexOf("WKD") != -1 && dayofweek != "SAT" && dayofweek != "SUN"){
                trains[item].sort(compareTime);
                console.log(trains[item]);
-               for(var i = 0;i<trains[item].length;i++){
-                printTrain(trains[item][i], selector);
-                console.log("minutes away: " + trains[item][i].arrival_time.diff(moment(), 'minutes'));
-                console.log("train time: " + trains[item][i].arrival_time.format("HH:mm:ss"));
-                console.log("current time: " + moment().format("HH:mm:ss"));
-                console.log(trains[item][i].route_id + ":" + trains[item][i].trip_headsign + ":" + trains[item][i].arrival_time);
-               }
+                 for(var i = 0;i<trains[item].length;i++){
+                  html += printTrain(trains[item][i], selector);
+                  console.log(trains[item][i].route_id + ":" + trains[item][i].trip_headsign + ":" + trains[item][i].arrival_time);
+                 }
+              
           }
-
-         
+          else{
+            //selector.after('<div class="row">No Trains available</div>');
+          }
         }
+        html += '</div>';
+        $(html).appendTo('.stop-results').each(function(){
+          $(this).slideDown();
+          });
+      
+        $(".stop-results > .stops").tsort("",{attr:"id"});
+  
       });
      
       //console.log(trains);
     }
 
     function printTrain(train, selector){
-      selector.after('<div class="row train-' + train.route_id + '"><div class="col-md-4">' +
-            train.route_id + '</div><div class="col-md-4">' + train.trip_headsign + '</div><div class="col-md-4"> Arriving in ' + 
-            train.arrival_time.diff(moment(), 'minutes') + ' minutes</div></div>');
+            var diff = train.arrival_time.diff(moment(), 'minutes');
+            var html = '<div class="row train-' + train.route_id + '"  id="' + diff + '"><div class="col-md-4">' +
+            train.route_id + '</div><div class="col-md-4">' + train.trip_headsign + '</div>';
+            html += '<div class="col-md-4"> Arriving ';
+            if(diff == 1){
+              html += 'in 1 minute';
+            }
+            else if (diff == 0){
+              html += 'now';
+            }
+            else{
+              html += 'in ' + diff + ' minutes'; 
+            }
+           html += '</div></div>';
       console.log(train.stop_id + " printed!")
+      return html;
     }
 
     function sortTrains(times, info, id)
@@ -215,5 +230,5 @@ function findStation(pos){
     }
 
     function compareTime(a, b) {
-      return b.arrival_time.diff(moment(), 'minutes') - a.arrival_time.diff(moment(), 'minutes');
+      return a.arrival_time.diff(moment(), 'minutes') - b.arrival_time.diff(moment(), 'minutes');
     }
