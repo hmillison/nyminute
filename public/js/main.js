@@ -130,9 +130,9 @@ function findStation(pos){
 
     function printOutput(traintimes,traininfo,station, direction){
       $('#status').fadeOut(function(){
-        console.log(station.stop_id);
-        var html = '<div class="stops" id="' + station.dist.toFixed(2) +  '" style="display:none">';
+        var html = '';
         if(!$('#' + station.stop_id + '').length){
+           html += '<div class="stops" id="' + station.dist.toFixed(2) +  '" style="display:none">';
             html += '<div class="row station" id="' + station.stop_id + '"><div class="col-md-6">' + station.stop_name
           + '</div><div class="col-md-6">' + station.dist.toFixed(2)
           + ' mi </div></div>'
@@ -165,10 +165,16 @@ function findStation(pos){
             //selector.after('<div class="row">No Trains available</div>');
           }
         }
+        if(!$('#' + station.stop_id + '').length){
         html += '</div>';
         $(html).appendTo('.stop-results').each(function(){
           $(this).slideDown();
           });
+      }
+      else{
+        $('#' + station.stop_id + '').after(html);
+        $(".stops > .train").tsort("",{attr:"id"});
+      }
       
         $(".stop-results > .stops").tsort("",{attr:"id"});
   
@@ -179,7 +185,7 @@ function findStation(pos){
 
     function printTrain(train, selector){
             var diff = train.arrival_time.diff(moment(), 'minutes');
-            var html = '<div class="row train-' + train.route_id + '"  id="' + diff + '"><div class="col-md-4">' +
+            var html = '<div class="row train train-' + train.route_id + '"  id="' + diff + '"><div class="col-md-4">' +
             train.route_id + '</div><div class="col-md-4">' + train.trip_headsign + '</div>';
             html += '<div class="col-md-4"> Arriving ';
             if(diff == 1){
